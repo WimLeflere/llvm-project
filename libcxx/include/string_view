@@ -149,6 +149,10 @@ namespace std {
       constexpr bool ends_with(charT c) const noexcept;               // C++2a
       constexpr bool ends_with(const charT* s) const;                 // C++2a
 
+      constexpr bool contains(basic_string_view s) const noexcept; // C++23
+      constexpr bool contains(charT c) const noexcept;             // C++23
+      constexpr bool contains(const charT* s) const;               // C++23
+
      private:
       const_pointer data_;  // exposition only
       size_type     size_;  // exposition only
@@ -620,6 +624,20 @@ public:
     _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
     bool ends_with(const value_type* __s) const _NOEXCEPT
     { return ends_with(basic_string_view(__s)); }
+#endif
+
+#if _LIBCPP_STD_VER > 20
+    _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
+    bool contains(basic_string_view __sv) const _NOEXCEPT
+    { return find(__sv) != npos; }
+
+    _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
+    bool contains(value_type __c) const _NOEXCEPT
+    { return find(__c) != npos; }
+
+    _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
+    bool contains(const value_type* __s) const _NOEXCEPT
+    { return find(__s) != npos; }
 #endif
 
 private:
