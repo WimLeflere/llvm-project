@@ -16,55 +16,58 @@
 
 #include "test_macros.h"
 
-int main(int, char**)
+constexpr bool test()
 {
-    {
     using S = std::string;
-    const char *s = "abcde";
 
-    S   s0;
-    S   s1  { s + 4, 1 };
-//  S   s2  { s + 3, 2 };
-    S   s3  { s + 2, 3 };
-//  S   s4  { s + 1, 4 };
-//  S   s5  { s,     5 };
-    S  sNot { "xyz", 3 };
+    const char* s = "abcde";
+    S s0;
+    S s1 {s + 4, 1};
+    S s3 {s + 2, 3};
+    S sNot {"xyz", 3};
 
     LIBCPP_ASSERT_NOEXCEPT(s0.contains(""));
 
-    assert ( s0.contains(""));
-    assert (!s0.contains("e"));
+    assert(s0.contains(""));
+    assert(!s0.contains("e"));
 
-    assert ( s1.contains(""));
-    assert (!s1.contains("d"));
-    assert ( s1.contains("e"));
-    assert (!s1.contains("de"));
-    assert (!s1.contains("cd"));
-    assert (!s1.contains("cde"));
-    assert (!s1.contains("bcde"));
-    assert (!s1.contains("abcde"));
-    assert (!s1.contains("xyz"));
+    assert( s1.contains(""));
+    assert(!s1.contains("d"));
+    assert( s1.contains("e"));
+    assert(!s1.contains("de"));
+    assert(!s1.contains("cd"));
+    assert(!s1.contains("cde"));
+    assert(!s1.contains("bcde"));
+    assert(!s1.contains("abcde"));
+    assert(!s1.contains("xyz"));
 
-    assert ( s3.contains(""));
-    assert ( s3.contains("d"));
-    assert ( s3.contains("e"));
-    assert ( s3.contains("de"));
-    assert ( s3.contains("cd"));
-    assert ( s3.contains("cde"));
-    assert (!s3.contains("bcde"));
-    assert (!s3.contains("abcde"));
-    assert (!s3.contains("xyz"));
+    assert( s3.contains(""));
+    assert( s3.contains("d"));
+    assert( s3.contains("e"));
+    assert( s3.contains("de"));
+    assert( s3.contains("cd"));
+    assert( s3.contains("cde"));
+    assert(!s3.contains("bcde"));
+    assert(!s3.contains("abcde"));
+    assert(!s3.contains("xyz"));
 
-    assert ( sNot.contains(""));
-    assert (!sNot.contains("d"));
-    assert (!sNot.contains("e"));
-    assert (!sNot.contains("de"));
-    assert (!sNot.contains("cd"));
-    assert (!sNot.contains("cde"));
-    assert (!sNot.contains("bcde"));
-    assert (!sNot.contains("abcde"));
-    assert ( sNot.contains("xyz"));
-    }
+    assert( sNot.contains(""));
+    assert(!sNot.contains("d"));
+    assert(!sNot.contains("e"));
+    assert(!sNot.contains("de"));
+    assert(!sNot.contains("cd"));
+    assert(!sNot.contains("cde"));
+    assert(!sNot.contains("bcde"));
+    assert(!sNot.contains("abcde"));
+    assert( sNot.contains("xyz"));
 
-  return 0;
+    return true;
+}
+
+int main(int, char**)
+{
+    test();
+    static_assert(test());
+
+    return 0;
 }
