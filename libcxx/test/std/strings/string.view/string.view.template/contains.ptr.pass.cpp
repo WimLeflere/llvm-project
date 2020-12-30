@@ -20,7 +20,7 @@
 int main(int, char**)
 {
     {
-    typedef std::string_view SV;
+    using SV = std::string_view;
     const char *s = "abcde";
     SV  sv0 {};
     SV  sv1 { s + 4, 1 };
@@ -68,7 +68,7 @@ int main(int, char**)
 
 #if TEST_STD_VER > 11
     {
-    typedef std::basic_string_view<char, constexpr_char_traits<char>> SV;
+    using SV = std::basic_string_view<char, constexpr_char_traits<char>>;
     constexpr const char *s = "abcde";
     constexpr SV  sv0 {};
     constexpr SV  sv1 { s + 4, 1 };

@@ -19,7 +19,7 @@
 int main(int, char**)
 {
     {
-    typedef std::string S;
+    using S = std::string;
     const char *s = "abcde";
 
     S   s0;

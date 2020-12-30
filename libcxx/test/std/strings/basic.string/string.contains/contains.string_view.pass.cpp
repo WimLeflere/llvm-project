@@ -19,8 +19,8 @@
 int main(int, char**)
 {
     {
-    typedef std::string S;
-    typedef std::string_view SV;
+    using S = std::string;
+    using SV = std::string_view;
     const char *s = "abcde";
 
     S   s0;
