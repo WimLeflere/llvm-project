@@ -15,38 +15,30 @@
 #include <cassert>
 
 #include "test_macros.h"
-#include "constexpr_char_traits.h"
 
-int main(int, char**)
+constexpr bool test()
 {
-    {
     using SV = std::string_view;
-    SV  sv1 {};
-    SV  sv2 { "abcde", 5 };
+
+    SV sv1 {};
+    SV sv2 {"abcde", 5};
 
     ASSERT_NOEXCEPT(sv1.contains('e'));
 
-    assert (!sv1.contains('c'));
-    assert (!sv1.contains('e'));
-    assert (!sv1.contains('x'));
-    assert ( sv2.contains('c'));
-    assert ( sv2.contains('e'));
-    assert (!sv2.contains('x'));
-    }
+    assert(!sv1.contains('c'));
+    assert(!sv1.contains('e'));
+    assert(!sv1.contains('x'));
+    assert( sv2.contains('c'));
+    assert( sv2.contains('e'));
+    assert(!sv2.contains('x'));
 
-#if TEST_STD_VER > 11
-    {
-    using SV = std::basic_string_view<char, constexpr_char_traits<char>>;
-    constexpr SV  sv1 {};
-    constexpr SV  sv2 { "abcde", 5 };
-    static_assert (!sv1.contains('c'));
-    static_assert (!sv1.contains('e'));
-    static_assert (!sv1.contains('x'));
-    static_assert ( sv2.contains('c'));
-    static_assert ( sv2.contains('e'));
-    static_assert (!sv2.contains('x'));
-    }
-#endif
+    return true;
+}
 
-  return 0;
+int main(int, char**)
+{
+    test();
+    static_assert(test());
+
+    return 0;
 }
