@@ -19,7 +19,7 @@
 int main(int, char**)
 {
     {
-    typedef std::string S;
+    using S = std::string;
     S  s1 {};
     S  s2 { "abcde", 5 };
 

@@ -20,7 +20,7 @@
 int main(int, char**)
 {
     {
-    typedef std::string_view SV;
+    using SV = std::string_view;
     SV  sv1 {};
     SV  sv2 { "abcde", 5 };
 
@@ -36,7 +36,7 @@ int main(int, char**)
 
 #if TEST_STD_VER > 11
     {
-    typedef std::basic_string_view<char, constexpr_char_traits<char>> SV;
+    using SV = std::basic_string_view<char, constexpr_char_traits<char>>;
     constexpr SV  sv1 {};
     constexpr SV  sv2 { "abcde", 5 };
     static_assert (!sv1.contains('c'));
