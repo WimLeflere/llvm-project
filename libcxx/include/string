@@ -324,9 +324,9 @@ public:
     bool ends_with(charT c) const noexcept;                               // C++2a
     bool ends_with(const charT* s) const;                                 // C++2a
 
-    bool contains(basic_string_view<charT, traits> sv) const noexcept; // C++23
-    bool contains(charT c) const noexcept;                             // C++23
-    bool contains(const charT* s) const;                               // C++23
+    bool contains(basic_string_view<charT, traits> sv) const noexcept; // C++2b
+    bool contains(charT c) const noexcept;                             // C++2b
+    bool contains(const charT* s) const;                               // C++2b
 
     bool __invariants() const;
 };

@@ -149,9 +149,9 @@ namespace std {
       constexpr bool ends_with(charT c) const noexcept;               // C++2a
       constexpr bool ends_with(const charT* s) const;                 // C++2a
 
-      constexpr bool contains(basic_string_view s) const noexcept; // C++23
-      constexpr bool contains(charT c) const noexcept;             // C++23
-      constexpr bool contains(const charT* s) const;               // C++23
+      constexpr bool contains(basic_string_view s) const noexcept; // C++2b
+      constexpr bool contains(charT c) const noexcept;             // C++2b
+      constexpr bool contains(const charT* s) const;               // C++2b
 
      private:
       const_pointer data_;  // exposition only
