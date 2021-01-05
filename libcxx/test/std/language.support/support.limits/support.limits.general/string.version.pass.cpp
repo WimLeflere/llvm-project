@@ -18,6 +18,7 @@
     __cpp_lib_char8_t                             201811L [C++2a]
     __cpp_lib_erase_if                            202002L [C++2a]
     __cpp_lib_nonmember_container_access          201411L [C++17]
+    __cpp_lib_starts_ends_with                    201711L [C++2a]
     __cpp_lib_string_udls                         201304L [C++14]
     __cpp_lib_string_view                         201606L [C++17]
 */
@@ -41,6 +42,10 @@
 
 # ifdef __cpp_lib_nonmember_container_access
 #   error "__cpp_lib_nonmember_container_access should not be defined before c++17"
+# endif
+
+# ifdef __cpp_lib_starts_ends_with
+#   error "__cpp_lib_starts_ends_with should not be defined before c++2a"
 # endif
 
 # ifdef __cpp_lib_string_udls
@@ -67,6 +72,10 @@
 
 # ifdef __cpp_lib_nonmember_container_access
 #   error "__cpp_lib_nonmember_container_access should not be defined before c++17"
+# endif
+
+# ifdef __cpp_lib_starts_ends_with
+#   error "__cpp_lib_starts_ends_with should not be defined before c++2a"
 # endif
 
 # ifndef __cpp_lib_string_udls
@@ -102,6 +111,10 @@
 # endif
 # if __cpp_lib_nonmember_container_access != 201411L
 #   error "__cpp_lib_nonmember_container_access should have the value 201411L in c++17"
+# endif
+
+# ifdef __cpp_lib_starts_ends_with
+#   error "__cpp_lib_starts_ends_with should not be defined before c++2a"
 # endif
 
 # ifndef __cpp_lib_string_udls
@@ -152,6 +165,13 @@
 # endif
 # if __cpp_lib_nonmember_container_access != 201411L
 #   error "__cpp_lib_nonmember_container_access should have the value 201411L in c++2a"
+# endif
+
+# ifndef __cpp_lib_starts_ends_with
+#   error "__cpp_lib_starts_ends_with should be defined in c++2a"
+# endif
+# if __cpp_lib_starts_ends_with != 201711L
+#   error "__cpp_lib_starts_ends_with should have the value 201711L in c++2a"
 # endif
 
 # ifndef __cpp_lib_string_udls
