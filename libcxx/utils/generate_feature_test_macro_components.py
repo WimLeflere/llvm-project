@@ -486,6 +486,12 @@ feature_test_macros = sorted([ add_version_header(x) for x in [
     "values": { "c++20": int(201907) },
     "headers": ["memory"]
   },
+  # C++2b
+  {
+    "name": "__cpp_lib_string_contains",
+    "values": { "c++2b": int(202011) },
+    "headers": ["string", "string_view"]
+  },
 ]], key=lambda tc: tc["name"])
 
 # Map from each header to the Lit annotations that should be used for
@@ -506,7 +512,7 @@ lit_markup = {
 }
 
 def get_std_dialects():
-  std_dialects = ['c++14', 'c++17', 'c++20']
+  std_dialects = ['c++14', 'c++17', 'c++20', 'c++2b']
   return list(std_dialects)
 
 def get_first_std(d):
@@ -659,6 +665,10 @@ def produce_version_header():
 {cxx20_macros}
 #endif
 
+#if _LIBCPP_STD_VER > 20
+{cxx2b_macros}
+#endif
+
 #endif // _LIBCPP_VERSIONH
 """
 
@@ -666,7 +676,8 @@ def produce_version_header():
       synopsis=produce_version_synopsis().strip(),
       cxx14_macros=produce_macros_definition_for_std('c++14').strip(),
       cxx17_macros=produce_macros_definition_for_std('c++17').strip(),
-      cxx20_macros=produce_macros_definition_for_std('c++20').strip())
+      cxx20_macros=produce_macros_definition_for_std('c++20').strip(),
+      cxx2b_macros=produce_macros_definition_for_std('c++2b').strip())
 
   version_header_path = os.path.join(include_path, 'version')
   with open(version_header_path, 'w', newline='\n') as f:
@@ -802,7 +813,11 @@ def produce_tests():
 
 {cxx20_tests}
 
-#endif // TEST_STD_VER == 20
+#elif TEST_STD_VER > 20
+
+{cxx2b_tests}
+
+#endif // TEST_STD_VER > 20
 
 int main(int, char**) {{ return 0; }}
 """.format(script_name=script_name,
@@ -812,7 +827,8 @@ int main(int, char**) {{ return 0; }}
            cxx11_tests=generate_std_test(test_list, 'c++11').strip(),
            cxx14_tests=generate_std_test(test_list, 'c++14').strip(),
            cxx17_tests=generate_std_test(test_list, 'c++17').strip(),
-           cxx20_tests=generate_std_test(test_list, 'c++20').strip())
+           cxx20_tests=generate_std_test(test_list, 'c++20').strip(),
+           cxx2b_tests=generate_std_test(test_list, 'c++2b').strip())
     test_name = "{header}.version.pass.cpp".format(header=h)
     out_path = os.path.join(macro_test_path, test_name)
     with open(out_path, 'w', newline='\n') as f:
