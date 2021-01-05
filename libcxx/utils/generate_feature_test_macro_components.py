@@ -485,6 +485,10 @@ feature_test_macros = sorted([ add_version_header(x) for x in [
     "name": "__cpp_lib_constexpr_dynamic_alloc",
     "values": { "c++2a": int(201907) },
     "headers": ["memory"]
+  }, {
+    "name": "__cpp_lib_starts_ends_with",
+    "values": { "c++2a": int(201711) },
+    "headers": ["string", "string_view"]
   },
 ]], key=lambda tc: tc["name"])
 
