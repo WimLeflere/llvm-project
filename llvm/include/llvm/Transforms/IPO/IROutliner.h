@@ -162,8 +162,9 @@ struct OutlinableRegion {
 class IROutliner {
 public:
   IROutliner(function_ref<TargetTransformInfo &(Function &)> GTTI,
-             function_ref<IRSimilarityIdentifier &(Module &)> GIRSI)
-      : getTTI(GTTI), getIRSI(GIRSI) {}
+             function_ref<IRSimilarityIdentifier &(Module &)> GIRSI,
+             function_ref<OptimizationRemarkEmitter &(Function &)> GORE)
+      : getTTI(GTTI), getIRSI(GIRSI), getORE(GORE) {}
   bool run(Module &M);
 
 private:
@@ -257,6 +258,10 @@ private:
                                     std::vector<Function *> &FuncsToRemove,
                                     unsigned &OutlinedFunctionNum);
 
+  /// If true, enables us to outline from functions that have LinkOnceFromODR
+  /// linkages.
+  bool OutlineFromLinkODRs = false;
+
   /// If false, we do not worry if the cost is greater than the benefit.  This
   /// is for debugging and testing, so that we can test small cases to ensure
   /// that the outlining is being done correctly.
@@ -276,6 +281,9 @@ private:
 
   /// IRSimilarityIdentifier lambda to retrieve IRSimilarityIdentifier.
   function_ref<IRSimilarityIdentifier &(Module &)> getIRSI;
+
+  /// The optimization remark emitter for the pass.
+  function_ref<OptimizationRemarkEmitter &(Function &)> getORE;
 
   /// The memory allocator used to allocate the CodeExtractors.
   SpecificBumpPtrAllocator<CodeExtractor> ExtractorAllocator;
@@ -310,14 +318,17 @@ private:
     // analyzed for similarity as it has no bearing on the outcome of the
     // program.
     bool visitDbgInfoIntrinsic(DbgInfoIntrinsic &DII) { return true; }
-    // TODO: Handle GetElementPtrInsts
-    bool visitGetElementPtrInst(GetElementPtrInst &GEPI) { return false; }
     // TODO: Handle specific intrinsics individually from those that can be
     // handled.
     bool IntrinsicInst(IntrinsicInst &II) { return false; }
-    // TODO: Handle CallInsts, there will need to be handling for special kinds
-    // of calls, as well as calls to intrinsics.
-    bool visitCallInst(CallInst &CI) { return false; }
+    // We only handle CallInsts that are not indirect, since we cannot guarantee
+    // that they have a name in these cases.
+    bool visitCallInst(CallInst &CI) {
+      Function *F = CI.getCalledFunction();
+      if (!F || CI.isIndirectCall() || !F->hasName())
+        return false;
+      return true;
+    }
     // TODO: Handle FreezeInsts.  Since a frozen value could be frozen inside
     // the outlined region, and then returned as an output, this will have to be
     // handled differently.
