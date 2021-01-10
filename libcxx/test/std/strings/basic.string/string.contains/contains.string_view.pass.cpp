@@ -34,7 +34,9 @@ constexpr bool test()
     SV sv3 {s + 1, 3};
     SV sv4 {s + 1, 4};
     SV sv5 {s    , 5};
-    SV svNot {"xyz", 3};
+    SV svNot  {"xyz", 3};
+    SV svNot2 {"bd" , 2};
+    SV svNot3 {"dcb", 3};
 
     ASSERT_NOEXCEPT(s0.contains(sv0));
 
@@ -48,6 +50,8 @@ constexpr bool test()
     assert(!s1.contains(sv4));
     assert(!s1.contains(sv5));
     assert(!s1.contains(svNot));
+    assert(!s1.contains(svNot2));
+    assert(!s1.contains(svNot3));
 
     assert( s3.contains(sv0));
     assert( s3.contains(sv1));
@@ -56,6 +60,8 @@ constexpr bool test()
     assert(!s3.contains(sv4));
     assert(!s3.contains(sv5));
     assert(!s3.contains(svNot));
+    assert(!s3.contains(svNot2));
+    assert(!s3.contains(svNot3));
 
     assert( s5.contains(sv0));
     assert( s5.contains(sv1));
@@ -64,6 +70,8 @@ constexpr bool test()
     assert( s5.contains(sv4));
     assert( s5.contains(sv5));
     assert(!s5.contains(svNot));
+    assert(!s5.contains(svNot2));
+    assert(!s5.contains(svNot3));
 
     assert( sNot.contains(sv0));
     assert(!sNot.contains(sv1));
@@ -72,6 +80,8 @@ constexpr bool test()
     assert(!sNot.contains(sv4));
     assert(!sNot.contains(sv5));
     assert( sNot.contains(svNot));
+    assert(!sNot.contains(svNot2));
+    assert(!sNot.contains(svNot3));
 
     return true;
 }

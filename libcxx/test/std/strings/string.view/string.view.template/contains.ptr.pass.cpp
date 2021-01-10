@@ -46,7 +46,9 @@ constexpr bool test()
     assert( sv3.contains("e"));
     assert( sv3.contains("de"));
     assert( sv3.contains("cd"));
-    assert(!sv3.contains("cde"));
+    assert(!sv3.contains("ce"));
+    assert( sv3.contains("cde"));
+    assert(!sv3.contains("edc"));
     assert(!sv3.contains("bcde"));
     assert(!sv3.contains("abcde"));
     assert(!sv3.contains("xyz"));
@@ -60,6 +62,7 @@ constexpr bool test()
     assert(!svNot.contains("bcde"));
     assert(!svNot.contains("abcde"));
     assert( svNot.contains("xyz"));
+    assert(!svNot.contains("zyx"));
 
     return true;
 }
