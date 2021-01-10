@@ -659,7 +659,7 @@ lit_markup = {
 }
 
 def get_std_dialects():
-  std_dialects = ['c++14', 'c++17', 'c++20', 'c++2b']
+  std_dialects = ['c++11','c++14', 'c++17', 'c++20', 'c++2b']
   return list(std_dialects)
 
 def get_first_std(d):
@@ -705,6 +705,8 @@ def get_for_std(d, std):
       return d[s]
   return None
 
+def get_std_nr(std):
+    return std.replace('c++', '')
 
 """
   Functions to produce the <version> header
@@ -733,7 +735,18 @@ def produce_macros_definition_for_std(std):
     result += "\n"
     if 'depends' in tc.keys():
       result += "# endif\n"
-  return result
+  return result.strip()
+
+def produce_macros_definitions():
+  std_dialects = get_std_dialects()
+
+  macros_definitions = ''
+  for previous, current in zip(std_dialects, std_dialects[1:]):
+      macros_definitions += '#if _LIBCPP_STD_VER > ' + get_std_nr(previous) + '\n'
+      macros_definitions += produce_macros_definition_for_std(current) + '\n'
+      macros_definitions += '#endif\n\n'
+
+  return macros_definitions
 
 def chunks(l, n):
   """Yield successive n-sized chunks from l."""
@@ -800,31 +813,12 @@ def produce_version_header():
 #pragma GCC system_header
 #endif
 
-#if _LIBCPP_STD_VER > 11
-{cxx14_macros}
-#endif
-
-#if _LIBCPP_STD_VER > 14
-{cxx17_macros}
-#endif
-
-#if _LIBCPP_STD_VER > 17
-{cxx20_macros}
-#endif
-
-#if _LIBCPP_STD_VER > 20
-{cxx2b_macros}
-#endif
-
-#endif // _LIBCPP_VERSIONH
+{cxx_macros}#endif // _LIBCPP_VERSIONH
 """
 
   version_str = template.format(
       synopsis=produce_version_synopsis().strip(),
-      cxx14_macros=produce_macros_definition_for_std('c++14').strip(),
-      cxx17_macros=produce_macros_definition_for_std('c++17').strip(),
-      cxx20_macros=produce_macros_definition_for_std('c++20').strip(),
-      cxx2b_macros=produce_macros_definition_for_std('c++2b').strip())
+      cxx_macros=produce_macros_definitions())
   version_header_path = os.path.join(include_path, 'version')
   with open(version_header_path, 'w', newline='\n') as f:
     f.write(version_str)
@@ -895,7 +889,32 @@ def generate_std_test(test_list, std):
       result += test_types["depends"].format(name=tc["name"], value=val, std=std, depends=tc["depends"])
     else:
       result +=  test_types["defined"].format(name=tc["name"], value=val, std=std)
-  return result
+  return result.strip()
+
+def generate_std_tests(test_list):
+  std_dialects = get_std_dialects()
+
+  std_tests = '#if TEST_STD_VER < ' + get_std_nr(std_dialects[1]) + '\n\n'
+  std_tests += generate_std_test(test_list, std_dialects[0]) + '\n\n'
+
+  for std in std_dialects[1:-1]:
+    std_tests += '#elif TEST_STD_VER == ' + get_std_nr(std) + '\n\n'
+    std_tests += generate_std_test(test_list, std) + '\n\n'
+
+  last_std = std_dialects[-1]
+  last_std_nr = get_std_nr(last_std)
+
+  if_condition = None
+  if last_std_nr.isnumeric():
+    if_condition = '== ' + last_std_nr
+  else:
+    if_condition = '> ' + get_std_nr(std_dialects[-2])
+  
+  std_tests += '#elif TEST_STD_VER ' + if_condition + '\n\n'
+  std_tests += generate_std_test(test_list, last_std) + '\n\n'
+  std_tests += '#endif // TEST_STD_VER ' + if_condition
+
+  return std_tests
 
 def generate_synopsis(test_list):
     max_name_len = max([len(tc["name"]) for tc in test_list])
@@ -943,38 +962,14 @@ def produce_tests():
 #include <{header}>
 #include "test_macros.h"
 
-#if TEST_STD_VER < 14
-
-{cxx11_tests}
-
-#elif TEST_STD_VER == 14
-
-{cxx14_tests}
-
-#elif TEST_STD_VER == 17
-
-{cxx17_tests}
-
-#elif TEST_STD_VER == 20
-
-{cxx20_tests}
-
-#elif TEST_STD_VER > 20
-
-{cxx2b_tests}
-
-#endif // TEST_STD_VER > 20
+{cxx_tests}
 
 int main(int, char**) {{ return 0; }}
 """.format(script_name=script_name,
            header=h,
            markup=('\n{}\n'.format(markup) if markup else ''),
            synopsis=generate_synopsis(test_list),
-           cxx11_tests=generate_std_test(test_list, 'c++11').strip(),
-           cxx14_tests=generate_std_test(test_list, 'c++14').strip(),
-           cxx17_tests=generate_std_test(test_list, 'c++17').strip(),
-           cxx20_tests=generate_std_test(test_list, 'c++20').strip(),
-           cxx2b_tests=generate_std_test(test_list, 'c++2b').strip())
+           cxx_tests=generate_std_tests(test_list))
     test_name = "{header}.version.pass.cpp".format(header=h)
     out_path = os.path.join(macro_test_path, test_name)
     with open(out_path, 'w', newline='\n') as f:
@@ -1023,7 +1018,7 @@ def pad_cell(s, length, left_align=True):
 
 def get_status_table():
   table = [["Macro Name", "Value"]]
-  for std in get_std_dialects():
+  for std in get_std_dialects()[1:]:
     table += [["**" + std.replace("c++", "C++ ") + "**", ""]]
     for tc in feature_test_macros:
       if std not in tc["values"].keys():
