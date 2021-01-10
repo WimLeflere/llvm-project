@@ -46,7 +46,9 @@ constexpr bool test()
     assert( s3.contains("e"));
     assert( s3.contains("de"));
     assert( s3.contains("cd"));
+    assert(!s3.contains("ce"));
     assert( s3.contains("cde"));
+    assert(!s3.contains("edc"));
     assert(!s3.contains("bcde"));
     assert(!s3.contains("abcde"));
     assert(!s3.contains("xyz"));
@@ -60,6 +62,7 @@ constexpr bool test()
     assert(!sNot.contains("bcde"));
     assert(!sNot.contains("abcde"));
     assert( sNot.contains("xyz"));
+    assert(!sNot.contains("zyx"));
 
     return true;
 }
