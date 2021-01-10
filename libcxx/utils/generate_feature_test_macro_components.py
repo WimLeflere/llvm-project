@@ -740,13 +740,15 @@ def produce_macros_definition_for_std(std):
 def produce_macros_definitions():
   std_dialects = get_std_dialects()
 
-  macros_definitions = ''
+  macros_definitions = []
   for previous, current in zip(std_dialects, std_dialects[1:]):
-      macros_definitions += '#if _LIBCPP_STD_VER > ' + get_std_nr(previous) + '\n'
-      macros_definitions += produce_macros_definition_for_std(current) + '\n'
-      macros_definitions += '#endif\n\n'
+      macros_definitions.append(
+        f'#if _LIBCPP_STD_VER > {get_std_nr(previous)}\n'
+        f'{produce_macros_definition_for_std(current)}\n'
+        '#endif'
+      )
 
-  return macros_definitions
+  return '\n\n'.join(macros_definitions)
 
 def chunks(l, n):
   """Yield successive n-sized chunks from l."""
@@ -813,7 +815,9 @@ def produce_version_header():
 #pragma GCC system_header
 #endif
 
-{cxx_macros}#endif // _LIBCPP_VERSIONH
+{cxx_macros}
+
+#endif // _LIBCPP_VERSIONH
 """
 
   version_str = template.format(
@@ -894,12 +898,13 @@ def generate_std_test(test_list, std):
 def generate_std_tests(test_list):
   std_dialects = get_std_dialects()
 
-  std_tests = '#if TEST_STD_VER < ' + get_std_nr(std_dialects[1]) + '\n\n'
-  std_tests += generate_std_test(test_list, std_dialects[0]) + '\n\n'
+  std_tests = []
+  std_tests.append(f'#if TEST_STD_VER < {get_std_nr(std_dialects[1])}\n\n' +
+                   generate_std_test(test_list, std_dialects[0]))
 
   for std in std_dialects[1:-1]:
-    std_tests += '#elif TEST_STD_VER == ' + get_std_nr(std) + '\n\n'
-    std_tests += generate_std_test(test_list, std) + '\n\n'
+    std_tests.append(f'#elif TEST_STD_VER == {get_std_nr(std)}\n\n' +
+                     generate_std_test(test_list, std))
 
   last_std = std_dialects[-1]
   last_std_nr = get_std_nr(last_std)
@@ -910,11 +915,12 @@ def generate_std_tests(test_list):
   else:
     if_condition = '> ' + get_std_nr(std_dialects[-2])
   
-  std_tests += '#elif TEST_STD_VER ' + if_condition + '\n\n'
-  std_tests += generate_std_test(test_list, last_std) + '\n\n'
-  std_tests += '#endif // TEST_STD_VER ' + if_condition
+  std_tests.append(f'#elif TEST_STD_VER {if_condition}\n\n' +
+                   generate_std_test(test_list, last_std))
 
-  return std_tests
+  std_tests.append(f'#endif // TEST_STD_VER {if_condition}')
+
+  return '\n\n'.join(std_tests)
 
 def generate_synopsis(test_list):
     max_name_len = max([len(tc["name"]) for tc in test_list])
