@@ -26,8 +26,6 @@ bool test()
     S s3 {s + 2, 3};
     S sNot {"xyz", 3};
 
-    LIBCPP_ASSERT_NOEXCEPT(s0.contains(""));
-
     assert(s0.contains(""));
     assert(!s0.contains("e"));
 

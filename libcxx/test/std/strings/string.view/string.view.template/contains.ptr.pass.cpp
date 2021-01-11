@@ -26,8 +26,6 @@ constexpr bool test()
     SV sv3 {s + 2, 3};
     SV svNot {"xyz", 3};
 
-    LIBCPP_ASSERT_NOEXCEPT(sv0.contains(""));
-
     assert( sv0.contains(""));
     assert(!sv0.contains("e"));
 
