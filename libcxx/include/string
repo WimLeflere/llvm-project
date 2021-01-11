@@ -324,9 +324,9 @@ public:
     bool ends_with(charT c) const noexcept;                               // C++20
     bool ends_with(const charT* s) const;                                 // C++20
 
-    bool contains(basic_string_view<charT, traits> sv) const noexcept; // C++2b
-    bool contains(charT c) const noexcept;                             // C++2b
-    bool contains(const charT* s) const;                               // C++2b
+    constexpr bool contains(basic_string_view<charT, traits> sv) const noexcept; // C++2b
+    constexpr bool contains(charT c) const noexcept;                             // C++2b
+    constexpr bool contains(const charT* s) const;                               // C++2b
 
     bool __invariants() const;
 };
@@ -1438,16 +1438,16 @@ public:
 #endif
 
 #if _LIBCPP_STD_VER > 20
-    _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
-    bool contains(__self_view __sv) const _NOEXCEPT
+    constexpr _LIBCPP_INLINE_VISIBILITY
+    bool contains(__self_view __sv) const noexcept
     { return __self_view(data(), size()).contains(__sv); }
 
-    _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
-    bool contains(value_type __c) const _NOEXCEPT
+    constexpr _LIBCPP_INLINE_VISIBILITY
+    bool contains(value_type __c) const noexcept
     { return __self_view(data(), size()).contains(__c); }
 
-    _LIBCPP_CONSTEXPR_AFTER_CXX11 _LIBCPP_INLINE_VISIBILITY
-    bool contains(const value_type* __s) const _NOEXCEPT
+    constexpr _LIBCPP_INLINE_VISIBILITY
+    bool contains(const value_type* __s) const
     { return __self_view(data(), size()).contains(__s); }
 #endif
 
