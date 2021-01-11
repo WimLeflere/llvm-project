@@ -89,7 +89,7 @@ constexpr bool test()
 int main(int, char**)
 {
     test();
-	// FIXME: wait for constexpr std::string
+    // FIXME: wait for constexpr std::string
     // static_assert(test());
 
     return 0;
