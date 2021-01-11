@@ -16,7 +16,7 @@
 
 #include "test_macros.h"
 
-constexpr bool test()
+bool test()
 {
     using S = std::string;
 
