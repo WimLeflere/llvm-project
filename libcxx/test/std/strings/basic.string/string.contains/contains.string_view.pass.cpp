@@ -9,7 +9,7 @@
 
 // <string>
 
-//   bool contains(basic_string_view x) const noexcept;
+//   constexpr bool contains(basic_string_view x) const noexcept;
 
 #include <string>
 #include <cassert>
@@ -89,7 +89,8 @@ constexpr bool test()
 int main(int, char**)
 {
     test();
-    static_assert(test());
+	// FIXME: wait for constexpr std::string
+    // static_assert(test());
 
     return 0;
 }
