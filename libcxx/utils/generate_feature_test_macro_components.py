@@ -896,27 +896,33 @@ def generate_std_test(test_list, std):
   return result.strip()
 
 def generate_std_tests(test_list):
+  std_tests_template = """#if TEST_STD_VER < {second_std_nr}
+
+{first_std_test}
+
+{other_std_tests}
+
+#elif TEST_STD_VER > {penultimate_std_nr}
+
+{last_std_test}
+
+#endif // TEST_STD_VER > {penultimate_std_nr}"""
+
   std_dialects = get_std_dialects()
+  assert not get_std_nr(std_dialects[-1]).isnumeric()
 
-  std_tests = []
-  std_tests.append(f'#if TEST_STD_VER < {get_std_nr(std_dialects[1])}\n\n' +
-                   generate_std_test(test_list, std_dialects[0]))
-
+  other_std_tests = []
   for std in std_dialects[1:-1]:
-    std_tests.append(f'#elif TEST_STD_VER == {get_std_nr(std)}\n\n' +
-                     generate_std_test(test_list, std))
+    other_std_tests.append('#elif TEST_STD_VER == ' + get_std_nr(std))
+    other_std_tests.append(generate_std_test(test_list, std))
 
-  last_std = std_dialects[-1]
-  assert not get_std_nr(last_std).isnumeric()
+  std_tests = std_tests_template.format(second_std_nr=get_std_nr(std_dialects[1]),
+                                        first_std_test=generate_std_test(test_list, std_dialects[0]),
+                                        other_std_tests='\n\n'.join(other_std_tests),
+                                        penultimate_std_nr=get_std_nr(std_dialects[-2]),
+                                        last_std_test=generate_std_test(test_list, std_dialects[-1]))
 
-  penultimate_std = get_std_nr(std_dialects[-2])
-
-  std_tests.append(f'#elif TEST_STD_VER > {penultimate_std}\n\n' +
-                   generate_std_test(test_list, last_std))
-
-  std_tests.append(f'#endif // TEST_STD_VER > {penultimate_std}')
-
-  return '\n\n'.join(std_tests)
+  return std_tests
 
 def generate_synopsis(test_list):
     max_name_len = max([len(tc["name"]) for tc in test_list])
