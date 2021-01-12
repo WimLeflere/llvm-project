@@ -738,15 +738,17 @@ def produce_macros_definition_for_std(std):
   return result.strip()
 
 def produce_macros_definitions():
+  macro_definition_template = """#if _LIBCPP_STD_VER > {previous_std_nr}
+{macro_definition}
+#endif"""
+
   std_dialects = get_std_dialects()
 
   macros_definitions = []
   for previous, current in zip(std_dialects, std_dialects[1:]):
       macros_definitions.append(
-        f'#if _LIBCPP_STD_VER > {get_std_nr(previous)}\n'
-        f'{produce_macros_definition_for_std(current)}\n'
-        '#endif'
-      )
+        macro_definition_template.format(previous_std_nr=get_std_nr(previous),
+                                         macro_definition=produce_macros_definition_for_std(current)))
 
   return '\n\n'.join(macros_definitions)
 
