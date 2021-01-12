@@ -659,7 +659,7 @@ lit_markup = {
 }
 
 def get_std_dialects():
-  std_dialects = ['c++11','c++14', 'c++17', 'c++20', 'c++2b']
+  std_dialects = ['c++14', 'c++17', 'c++20', 'c++2b']
   return list(std_dialects)
 
 def get_first_std(d):
@@ -742,13 +742,13 @@ def produce_macros_definitions():
 {macro_definition}
 #endif"""
 
-  std_dialects = get_std_dialects()
-
   macros_definitions = []
-  for previous, current in zip(std_dialects, std_dialects[1:]):
-      macros_definitions.append(
-        macro_definition_template.format(previous_std_number=get_std_number(previous),
-                                         macro_definition=produce_macros_definition_for_std(current)))
+  previous_std_number = '11'
+  for std in get_std_dialects():
+    macros_definitions.append(
+      macro_definition_template.format(previous_std_number=previous_std_number,
+                                       macro_definition=produce_macros_definition_for_std(std)))
+    previous_std_number = get_std_number(std)
 
   return '\n\n'.join(macros_definitions)
 
@@ -898,9 +898,9 @@ def generate_std_test(test_list, std):
   return result.strip()
 
 def generate_std_tests(test_list):
-  std_tests_template = """#if TEST_STD_VER < {second_std_number}
+  std_tests_template = """#if TEST_STD_VER < {first_std_number}
 
-{first_std_test}
+{pre_std_test}
 
 {other_std_tests}
 
@@ -914,12 +914,12 @@ def generate_std_tests(test_list):
   assert not get_std_number(std_dialects[-1]).isnumeric()
 
   other_std_tests = []
-  for std in std_dialects[1:-1]:
+  for std in std_dialects[:-1]:
     other_std_tests.append('#elif TEST_STD_VER == ' + get_std_number(std))
     other_std_tests.append(generate_std_test(test_list, std))
 
-  std_tests = std_tests_template.format(second_std_number=get_std_number(std_dialects[1]),
-                                        first_std_test=generate_std_test(test_list, std_dialects[0]),
+  std_tests = std_tests_template.format(first_std_number=get_std_number(std_dialects[0]),
+                                        pre_std_test=generate_std_test(test_list, 'c++11'),
                                         other_std_tests='\n\n'.join(other_std_tests),
                                         penultimate_std_number=get_std_number(std_dialects[-2]),
                                         last_std_test=generate_std_test(test_list, std_dialects[-1]))
@@ -1028,7 +1028,7 @@ def pad_cell(s, length, left_align=True):
 
 def get_status_table():
   table = [["Macro Name", "Value"]]
-  for std in get_std_dialects()[1:]:
+  for std in get_std_dialects():
     table += [["**" + std.replace("c++", "C++ ") + "**", ""]]
     for tc in feature_test_macros:
       if std not in tc["values"].keys():
