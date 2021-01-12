@@ -705,7 +705,7 @@ def get_for_std(d, std):
       return d[s]
   return None
 
-def get_std_nr(std):
+def get_std_number(std):
     return std.replace('c++', '')
 
 """
@@ -738,7 +738,7 @@ def produce_macros_definition_for_std(std):
   return result.strip()
 
 def produce_macros_definitions():
-  macro_definition_template = """#if _LIBCPP_STD_VER > {previous_std_nr}
+  macro_definition_template = """#if _LIBCPP_STD_VER > {previous_std_number}
 {macro_definition}
 #endif"""
 
@@ -747,7 +747,7 @@ def produce_macros_definitions():
   macros_definitions = []
   for previous, current in zip(std_dialects, std_dialects[1:]):
       macros_definitions.append(
-        macro_definition_template.format(previous_std_nr=get_std_nr(previous),
+        macro_definition_template.format(previous_std_number=get_std_number(previous),
                                          macro_definition=produce_macros_definition_for_std(current)))
 
   return '\n\n'.join(macros_definitions)
@@ -898,30 +898,30 @@ def generate_std_test(test_list, std):
   return result.strip()
 
 def generate_std_tests(test_list):
-  std_tests_template = """#if TEST_STD_VER < {second_std_nr}
+  std_tests_template = """#if TEST_STD_VER < {second_std_number}
 
 {first_std_test}
 
 {other_std_tests}
 
-#elif TEST_STD_VER > {penultimate_std_nr}
+#elif TEST_STD_VER > {penultimate_std_number}
 
 {last_std_test}
 
-#endif // TEST_STD_VER > {penultimate_std_nr}"""
+#endif // TEST_STD_VER > {penultimate_std_number}"""
 
   std_dialects = get_std_dialects()
-  assert not get_std_nr(std_dialects[-1]).isnumeric()
+  assert not get_std_number(std_dialects[-1]).isnumeric()
 
   other_std_tests = []
   for std in std_dialects[1:-1]:
-    other_std_tests.append('#elif TEST_STD_VER == ' + get_std_nr(std))
+    other_std_tests.append('#elif TEST_STD_VER == ' + get_std_number(std))
     other_std_tests.append(generate_std_test(test_list, std))
 
-  std_tests = std_tests_template.format(second_std_nr=get_std_nr(std_dialects[1]),
+  std_tests = std_tests_template.format(second_std_number=get_std_number(std_dialects[1]),
                                         first_std_test=generate_std_test(test_list, std_dialects[0]),
                                         other_std_tests='\n\n'.join(other_std_tests),
-                                        penultimate_std_nr=get_std_nr(std_dialects[-2]),
+                                        penultimate_std_number=get_std_number(std_dialects[-2]),
                                         last_std_test=generate_std_test(test_list, std_dialects[-1]))
 
   return std_tests
