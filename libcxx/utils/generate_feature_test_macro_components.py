@@ -907,18 +907,14 @@ def generate_std_tests(test_list):
                      generate_std_test(test_list, std))
 
   last_std = std_dialects[-1]
-  last_std_nr = get_std_nr(last_std)
+  assert not get_std_nr(last_std).isnumeric()
 
-  if_condition = None
-  if last_std_nr.isnumeric():
-    if_condition = '== ' + last_std_nr
-  else:
-    if_condition = '> ' + get_std_nr(std_dialects[-2])
-  
-  std_tests.append(f'#elif TEST_STD_VER {if_condition}\n\n' +
+  penultimate_std = get_std_nr(std_dialects[-2])
+
+  std_tests.append(f'#elif TEST_STD_VER > {penultimate_std}\n\n' +
                    generate_std_test(test_list, last_std))
 
-  std_tests.append(f'#endif // TEST_STD_VER {if_condition}')
+  std_tests.append(f'#endif // TEST_STD_VER > {penultimate_std}')
 
   return '\n\n'.join(std_tests)
 
