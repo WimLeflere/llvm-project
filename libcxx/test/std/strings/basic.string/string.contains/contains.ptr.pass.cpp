@@ -68,8 +68,6 @@ bool test()
 int main(int, char**)
 {
     test();
-    // FIXME: wait for constexpr std::string P0980
-    // static_assert(test());
 
     return 0;
 }
