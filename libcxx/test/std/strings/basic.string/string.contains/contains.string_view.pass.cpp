@@ -16,7 +16,7 @@
 
 #include "test_macros.h"
 
-bool test()
+void test()
 {
     using S = std::string;
     using SV = std::string_view;
@@ -82,8 +82,6 @@ bool test()
     assert( sNot.contains(svNot));
     assert(!sNot.contains(svNot2));
     assert(!sNot.contains(svNot3));
-
-    return true;
 }
 
 int main(int, char**)

@@ -16,7 +16,7 @@
 
 #include "test_macros.h"
 
-bool test()
+void test()
 {
     using S = std::string;
 
@@ -31,8 +31,6 @@ bool test()
     assert( s2.contains('c'));
     assert( s2.contains('e'));
     assert(!s2.contains('x'));
-
-    return true;
 }
 
 int main(int, char**)
